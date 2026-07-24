@@ -135,11 +135,14 @@ export function LdOutsourceSummary() {
     return Math.max(units * unit + express - disc, 0);
   };
 
-  // Clinic-side expected income = case Net Amount (lab_fee - discount).
-  // lab_fee on ld_cases already reflects the charged case total; do not multiply by units.
+  // Clinic-side expected income = base price × units − discount.
+  // lab_fee on ld_cases is the per-unit base price (matches the "Base (n units × ₦x)" line
+  // on the case form), so it must be multiplied by units. Extras like express/courier are
+  // intentionally excluded — this shows the base inflow, matching the Per Work Type breakdown.
   const clinicValue = (c: any) => {
+    const units = Number(c.tooth_number) || 1;
     const disc = Number(c.discount) || 0;
-    return Math.max((Number(c.lab_fee) || 0) - disc, 0);
+    return Math.max((Number(c.lab_fee) || 0) * units - disc, 0);
   };
 
   const saveOverride = async (caseId: string) => {
